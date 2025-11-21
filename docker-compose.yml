@@ -1,0 +1,44 @@
+version: "3.8"
+services:
+  php-apache:
+    image: php:8.1-apache
+    container_name: adept-php
+    ports:
+      - "8080:80"
+    volumes:
+      - ./public:/var/www/html:cached
+      - ./common:/var/www/common:cached
+      - ./uploads:/var/www/html/uploads
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=secret
+      - MYSQL_DATABASE=adept_cinema
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    container_name: adept-db
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: adept_cinema
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: secret
+    depends_on:
+      - db
+
+volumes:
+  db_data:
